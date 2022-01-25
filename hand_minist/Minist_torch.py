@@ -27,21 +27,22 @@ class Mnist_Net(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
-model = Mnist_Net()
-model = model.cuda()
-optimizer = optim.SGD(model.parameters, lr=0.01)
+#model = Mnist_Net()
+#model = model.cuda()
+#optimizer = optim.SGD(model.parameters, lr=0.01)
 
 
-def fit(epoch, model, data_loader, phase='training', volatile=False):
+def fit(optimizer,epoch, model, data_loader, phase='training', volatile=False):
     if phase == 'training':
-        model.tran()
+        model.train()
     if phase == 'Validation':
         model.eval()
         volatile = True
     running_loss = 0.0
     running_correct = 0
     for batch_idx, (data, target) in enumerate (data_loader):
-        data, target = data.cuda(),   target.cuda()
+       # data, target = data.cuda(),   target.cuda()
+        data, target = data,   target
         data, target = Variable(data, volatile), Variable(target)
         if phase == 'training':
             optimizer.zero_grad()#重置梯度
@@ -49,27 +50,40 @@ def fit(epoch, model, data_loader, phase='training', volatile=False):
         loss = F.nll_loss(output, target)
         running_loss += F.nll_loss(output, target, size_average=False).item()#计算总的损失值
         preds = output.data.max(dim = 1, keepdim = True)[1]#预测概率转化为数字
-        running_correct += preds.eq(target.data.view_as(preds)).cpu.sum()
+      #  running_correct += preds.eq(target.data.view_as(preds)).cpu.sum()
+        running_correct += preds.eq(target.data.view_as(preds)).sum()
         if phase == 'training':
             loss.backward()
             optimizer.step()
         loss = running_loss/len(data_loader.dataset)
         accuracy = 100. *running_correct/len(data_loader.dataset)
-        print(f'{phase} loss is {loss:{5}.{2} }and {phase} accuracy is {running_correct}/{len(data_loader.dataset)}{accuracy: {10}.{4}}')
-        return loss,    accuracy
+        print(f'{phase} loss is {loss:{5}.{2}} and {phase} accuracy is {running_correct}/{len(data_loader.dataset)}{accuracy:{10}.{4}}')
+    return loss, accuracy
 
-def tain():
+def Mytrain(model,optimizer, train_loader, test_loader):
     train_losses, train_accuracy = [], []
     val_losses, val_accuracy = [], []
-    for epoch in range(1, 40):
-        epoch_loss, epoch_accuracy = fit(epoch, model, train_loader, phase='training')
-        val_epoch_loss, val_epoch_accuracy = fit(epoch, model, test_loader, phase='validation')
+    for epoch in range(1, 500):
+        epoch_loss, epoch_accuracy = fit(optimizer,epoch, model, train_loader, phase='training')
+        val_epoch_loss, val_epoch_accuracy = fit(optimizer,epoch, model, test_loader, phase='validation')
         train_losses.append(epoch_loss)
         train_accuracy.append(epoch_accuracy)
         val_losses.append(val_epoch_loss)
         val_accuracy.append(val_epoch_accuracy)
 
-    if __name__ =='__main__':
-        model = Mnist_Net()
-        model = model.cuda()
-        optimizer = optim.SGD(model.parameters, lr=0.01)
+if __name__ =="__main__":
+    transformation = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,),(0.3018,))])
+    train_dataset = datasets.MNIST('data/', train=True,transform = transformation,download=True)
+    test_dataset = datasets.MNIST('data/', train=False, transform = transformation, download=True)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size = 8, shuffle = True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size = 8, shuffle = True)
+
+    print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",len(train_loader))
+    print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",len(test_loader))
+                
+    model = Mnist_Net()
+      #  model = model.cuda()
+    optimizer = optim.SGD(model.parameters(), lr=0.01)
+
+
+    Mytrain(model, optimizer, train_loader, test_loader)
