@@ -55,15 +55,15 @@ def fit(optimizer,epoch, model, data_loader, phase='training', volatile=False):
         if phase == 'training':
             loss.backward()
             optimizer.step()
-        loss = running_loss/len(data_loader.dataset)
-        accuracy = 100. *running_correct/len(data_loader.dataset)
-        print(f'{phase} loss is {loss:{5}.{2}} and {phase} accuracy is {running_correct}/{len(data_loader.dataset)}{accuracy:{10}.{4}}')
+    loss = running_loss/len(data_loader.dataset)
+    accuracy = 100. *running_correct/len(data_loader.dataset)
+    print(f'{phase} loss is {loss:{5}.{2}} and {phase} accuracy is {running_correct}/{len(data_loader.dataset)}{accuracy:{10}.{4}}')
     return loss, accuracy
 
 def Mytrain(model,optimizer, train_loader, test_loader):
     train_losses, train_accuracy = [], []
     val_losses, val_accuracy = [], []
-    for epoch in range(1, 500):
+    for epoch in range(1, 40):
         epoch_loss, epoch_accuracy = fit(optimizer,epoch, model, train_loader, phase='training')
         val_epoch_loss, val_epoch_accuracy = fit(optimizer,epoch, model, test_loader, phase='validation')
         train_losses.append(epoch_loss)
