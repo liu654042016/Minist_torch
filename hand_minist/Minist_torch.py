@@ -80,10 +80,10 @@ if __name__ =="__main__":
 
     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>",len(train_loader))
     print("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<",len(test_loader))
-                
+
+
+    print("aaaa")            
     model = Mnist_Net()
       #  model = model.cuda()
     optimizer = optim.SGD(model.parameters(), lr=0.01)
-
-
     Mytrain(model, optimizer, train_loader, test_loader)
