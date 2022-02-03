@@ -11,15 +11,13 @@ from data import DataReader
 
 
 
-
-
-
 def lossCalculator(predictions, labels):
+    coss = torch.nn.MSELoss(reduction='mean')
     return coss(predictions , labels)
 
 
 
-def train(input_features, labels,batch_size, optimizer):
+def train(input_features, labels,my_model,batch_size, optimizer):
     losses = []  
     for i in range(1000):
         batch_loss = []
@@ -27,7 +25,8 @@ def train(input_features, labels,batch_size, optimizer):
             end = start + batch_size if start+batch_size < len(input_features) else len(input_features)
             xx = torch.tensor(input_features[start : end], dtype=torch.float, requires_grad=True)
             yy = torch.tensor(labels[start : end], dtype= torch.float, requires_grad=True)
-            prediction = TemptureModel(xx)
+            #prediction = TemptureModel(xx)
+            prediction = my_model(xx)
             loss = lossCalculator(prediction, yy)
             optimizer.zero_grad()
             loss.backward(retain_graph = True)
@@ -42,7 +41,11 @@ def train(input_features, labels,batch_size, optimizer):
 
 
 if __name__ == '__main__':
-    
-    temptureModel = TemptureModel(input_features)
-    coss = torch.nn.MSELoss(reduction='mean')
+
+    path="D:\\study\\deeplearing\\Minist_torch\\data\\Weather\\NewTemp\\tempsssssss\\temps1.csv"
+    my = DataReader(path)
+    input_features, labels = my.get_format_data()
+    temptureModel = TemptureModel(input_features.shape[1])
     optimizer = torch.optim.Adam(temptureModel.parameters(), lr = 0.001)
+    train(input_features, labels, temptureModel,1, optimizer)
+    print("done")

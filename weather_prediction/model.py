@@ -10,6 +10,7 @@ import torch.nn.functional as F
 class TemptureModel(torch.nn.Module):
     def __init__(self, input_shape) -> None:
         super(TemptureModel, self).__init__()
+        print(".........", input_shape)
         self.input_size = input_shape
         self.LinearInput = torch.nn.Linear(self.input_size, 128)
         self.LinearOutput = torch.nn.Linear(128, 1)

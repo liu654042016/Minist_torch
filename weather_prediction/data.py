@@ -52,7 +52,9 @@ class DataReader():
         
         input_features = preprocessing.StandardScaler().fit_transform(self.features)
         print(len(input_features))
-        return input_features
+        return input_features, labels
+    def get_labels(self):
+        pass
 
 
     
